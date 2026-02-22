@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Column, Heading, Text } from "@once-ui-system/core";
 import {
   CreationScreen,
@@ -39,10 +39,28 @@ export default function Home() {
   const [customAction, setCustomAction] = useState("");
   const [isProcessing, setIsProcessing] = useState(false);
   const [isAffectionPanelOpen, setIsAffectionPanelOpen] = useState(false);
+  const [isStoryTrolled, setIsStoryTrolled] = useState(false);
 
   const beat = useMemo(() => getCurrentBeat(storyIndex), [storyIndex]);
 
   const chapterAnimationKey = `${beat.id}-${storyIndex}`;
+
+  useEffect(() => {
+    if (screen !== "story") {
+      setIsStoryTrolled(false);
+      return;
+    }
+
+    setIsStoryTrolled(false);
+
+    const timer = window.setTimeout(() => {
+      setIsStoryTrolled(true);
+    }, 5000);
+
+    return () => {
+      window.clearTimeout(timer);
+    };
+  }, [screen]);
 
   const resetStoryState = () => {
     setHeartbeat(initialHeartbeat);
@@ -52,6 +70,7 @@ export default function Home() {
     setCustomAction("");
     setIsProcessing(false);
     setIsAffectionPanelOpen(false);
+    setIsStoryTrolled(false);
   };
 
   const goToCreation = () => {
@@ -191,6 +210,7 @@ export default function Home() {
             haoCam={haoCam}
             customAction={customAction}
             isProcessing={isProcessing}
+            isStoryTrolled={isStoryTrolled}
             chapterAnimationKey={chapterAnimationKey}
             isAffectionPanelOpen={isAffectionPanelOpen}
             onToggleAffectionPanel={() => setIsAffectionPanelOpen((prev) => !prev)}
