@@ -21,6 +21,8 @@ export interface CharacterProfile {
   archetype: string;
   affection: number;
   memories: string[];
+  /** Preview image URL for slider indicator. Falls back to Avatar initials when not set. */
+  previewImage?: string;
 }
 
 export interface StoryChoice {

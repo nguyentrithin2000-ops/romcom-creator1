@@ -34,9 +34,6 @@ export default function Home() {
   const [haoCam, setHaoCam] = useState(initialHaoCam);
 
   const [characters, setCharacters] = useState(initialCharacters);
-  const [selectedCharacterId, setSelectedCharacterId] = useState<string | null>(
-    initialCharacters[0]?.id ?? null,
-  );
 
   const [storyIndex, setStoryIndex] = useState(0);
   const [customAction, setCustomAction] = useState("");
@@ -51,7 +48,6 @@ export default function Home() {
     setHeartbeat(initialHeartbeat);
     setHaoCam(initialHaoCam);
     setCharacters(initialCharacters);
-    setSelectedCharacterId(initialCharacters[0]?.id ?? null);
     setStoryIndex(0);
     setCustomAction("");
     setIsProcessing(false);
@@ -191,7 +187,6 @@ export default function Home() {
           <StoryScreen
             beat={beat}
             characters={characters}
-            selectedCharacterId={selectedCharacterId}
             heartbeat={heartbeat}
             haoCam={haoCam}
             customAction={customAction}
@@ -199,13 +194,38 @@ export default function Home() {
             chapterAnimationKey={chapterAnimationKey}
             isAffectionPanelOpen={isAffectionPanelOpen}
             onToggleAffectionPanel={() => setIsAffectionPanelOpen((prev) => !prev)}
-            onSelectCharacter={setSelectedCharacterId}
             onSelectChoice={handlePresetChoice}
             onCustomActionChange={setCustomAction}
             onSubmitCustomAction={handleSubmitCustomAction}
           />
         )}
       </Column>
+      {/* Corner glow - brand accent top-right */}
+      <Column
+        position="absolute"
+        style={{
+          top: 0,
+          right: 0,
+          width: "40%",
+          height: "50%",
+          background:
+            "radial-gradient(ellipse at top right, var(--once-brand-alpha-weak, rgba(99 102 241 / 0.15)) 0%, transparent 70%)",
+          pointerEvents: "none",
+        }}
+      />
+      {/* Corner glow - accent bottom-left */}
+      <Column
+        position="absolute"
+        style={{
+          bottom: 0,
+          left: 0,
+          width: "35%",
+          height: "45%",
+          background:
+            "radial-gradient(ellipse at bottom left, var(--once-accent-alpha-weak, rgba(236 72 153 / 0.12)) 0%, transparent 70%)",
+          pointerEvents: "none",
+        }}
+      />
     </Column>
   );
 }

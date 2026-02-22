@@ -1,4 +1,4 @@
-import { type Colors, Column, Row, Text } from "@once-ui-system/core";
+import { type Colors, Column, Icon, Row, Text } from "@once-ui-system/core";
 
 interface AffectionBarProps {
   label: string;
@@ -7,53 +7,57 @@ interface AffectionBarProps {
 
 const clamp = (value: number) => Math.max(0, Math.min(100, value));
 
+type ToneConfig = {
+  name: string;
+  icon: "faceFrown" | "faceSmile" | "heart";
+  fill: Colors;
+  badgeBorder: Colors;
+  badgeBackground: Colors;
+  badgeOnBackground: Colors;
+};
+
+function getTone(level: number): ToneConfig {
+  if (level < 34) {
+    return {
+      name: "Căng thẳng",
+      icon: "faceFrown",
+      fill: "danger-medium",
+      badgeBorder: "danger-alpha-medium",
+      badgeBackground: "danger-alpha-weak",
+      badgeOnBackground: "danger-strong",
+    };
+  }
+  if (level < 67) {
+    return {
+      name: "Trung lập",
+      icon: "faceSmile",
+      fill: "info-medium",
+      badgeBorder: "info-alpha-medium",
+      badgeBackground: "info-alpha-weak",
+      badgeOnBackground: "info-strong",
+    };
+  }
+  return {
+    name: "Rung động",
+    icon: "heart",
+    fill: "accent-medium",
+    badgeBorder: "accent-alpha-medium",
+    badgeBackground: "accent-alpha-weak",
+    badgeOnBackground: "accent-strong",
+  };
+}
+
 export function AffectionBar({ label, value }: AffectionBarProps) {
   const level = clamp(value);
-
-  const tone: {
-    name: string;
-    fill: Colors;
-    badgeBorder: Colors;
-    badgeBackground: Colors;
-    badgeOnBackground: Colors;
-  } = {
-    name: "",
-    fill: "neutral-medium",
-    badgeBorder: "neutral-alpha-medium",
-    badgeBackground: "neutral-alpha-weak",
-    badgeOnBackground: "neutral-strong",
-  };
-
-  if (level < 34) {
-    level < 34
-      ? {
-          name: "Căng thẳng",
-          fill: "danger-solid-medium",
-          badgeBorder: "danger-alpha-medium",
-          badgeBackground: "danger-alpha-weak",
-          badgeOnBackground: "danger-strong",
-        }
-      : level < 67
-        ? {
-            name: "Trung lập",
-            fill: "info-solid-medium",
-            badgeBorder: "info-alpha-medium",
-            badgeBackground: "info-alpha-weak",
-            badgeOnBackground: "info-strong",
-          }
-        : {
-            name: "Rung động",
-            fill: "accent-solid-medium",
-            badgeBorder: "accent-alpha-medium",
-            badgeBackground: "accent-alpha-weak",
-            badgeOnBackground: "accent-strong",
-          };
-  }
+  const tone = getTone(level);
 
   return (
     <Column fillWidth gap="8">
       <Row fillWidth horizontal="between" vertical="center" gap="8">
-        <Text variant="label-strong-m">{label}</Text>
+        <Row gap={6} vertical="center">
+          <Icon name={tone.icon} size="s" onBackground={tone.badgeOnBackground as "danger-strong" | "info-strong" | "accent-strong"} />
+          <Text variant="label-strong-m">{label}</Text>
+        </Row>
         <Text variant="label-default-m" onBackground="neutral-weak">
           {level}%
         </Text>
@@ -85,7 +89,10 @@ export function AffectionBar({ label, value }: AffectionBarProps) {
         radius="full"
         paddingX="8"
         paddingY="4"
+        gap={6}
+        vertical="center"
       >
+        <Icon name={tone.icon} size="xs" onBackground={tone.badgeOnBackground as "danger-strong" | "info-strong" | "accent-strong"} />
         <Text variant="label-default-xs">{tone.name}</Text>
       </Row>
     </Column>

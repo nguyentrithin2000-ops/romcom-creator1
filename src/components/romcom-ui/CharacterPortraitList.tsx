@@ -1,5 +1,5 @@
 import { Avatar, Column, Row, Text } from "@once-ui-system/core";
-import { CharacterProfile } from "./types";
+import type { CharacterProfile } from "./types";
 
 interface CharacterPortraitListProps {
   characters: CharacterProfile[];

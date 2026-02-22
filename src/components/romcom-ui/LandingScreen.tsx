@@ -1,5 +1,23 @@
-import { Badge, Button, Card, Column, Grid, Heading, Row, Text } from "@once-ui-system/core";
+import {
+  Badge,
+  Button,
+  Card,
+  Column,
+  Grid,
+  Heading,
+  Icon,
+  RevealFx,
+  Row,
+  Text,
+  TiltFx,
+} from "@once-ui-system/core";
 import type { TemplateOption } from "./types";
+
+const TEMPLATE_ICONS: Record<string, "academicCap" | "sparkles" | "building"> = {
+  "hoc-duong-thanh-xuan": "academicCap",
+  "isekai-romcom": "sparkles",
+  "drama-cong-so": "building",
+};
 
 interface LandingScreenProps {
   haoCam: number;
@@ -18,16 +36,18 @@ export function LandingScreen({
     <Column fillWidth gap="32">
       <Row fillWidth horizontal="between" vertical="center" gap="12" wrap>
         <Badge
+          icon="sparkles"
           border="brand-alpha-medium"
           background="brand-alpha-weak"
           onBackground="brand-strong"
           paddingX="12"
           paddingY="8"
         >
-          <Text variant="label-default-s">Bản demo tương tác</Text>
+          <Text variant="label-default-s">Gemini 3.0 Pro</Text>
         </Badge>
 
         <Badge
+          icon="thunder"
           border="accent-alpha-medium"
           background="accent-alpha-weak"
           onBackground="accent-strong"
@@ -57,15 +77,22 @@ export function LandingScreen({
         vertical="center"
         horizontal="between"
         s={{ direction: "column" }}
+        transition="micro-medium"
+        shadow="s"
       >
-        <Column gap="4">
-          <Text variant="heading-strong-s">Bắt đầu nhanh</Text>
-          <Text variant="body-default-s" onBackground="neutral-weak">
-            Vào ngay màn tạo truyện với dữ liệu mẫu để thử nhịp chơi.
-          </Text>
-        </Column>
+        <Row gap="16" vertical="center">
+          <Column background="brand-alpha-weak" border="brand-alpha-medium" radius="m" padding="12">
+            <Icon name="rocket" size="l" onBackground="brand-strong" />
+          </Column>
+          <Column gap="4">
+            <Text variant="heading-strong-s">Bắt đầu nhanh</Text>
+            <Text variant="body-default-s" onBackground="neutral-weak">
+              Vào ngay màn tạo truyện với dữ liệu mẫu để thử nhịp chơi.
+            </Text>
+          </Column>
+        </Row>
 
-        <Button variant="primary" size="m" onClick={onQuickStart}>
+        <Button variant="primary" size="m" prefixIcon="rocket" onClick={onQuickStart}>
           Bắt đầu nhanh
         </Button>
       </Row>
@@ -79,31 +106,57 @@ export function LandingScreen({
         </Column>
 
         <Grid columns={1} m={{ columns: 2 }} l={{ columns: 3 }} gap="16" fillWidth>
-          {templates.map((template) => (
-            <Card
-              key={template.id}
-              border="neutral-alpha-medium"
-              background="surface"
-              radius="l"
-              padding="16"
-              gap="16"
-              fillHeight
-              onClick={() => onSelectTemplate(template.id)}
-            >
-              <Column gap="12" fillWidth flex="1" style={{ minHeight: 0 }}>
-                <Column gap="8">
-                  <Text variant="label-strong-m">{template.title}</Text>
-                  <Text variant="label-default-s" onBackground="neutral-weak">
-                    {template.subtitle}
-                  </Text>
-                </Column>
+          {templates.map((template, index) => {
+            const cardBg =
+              index % 3 === 0
+                ? "neutral-alpha-weak"
+                : index % 3 === 1
+                  ? "brand-alpha-weak"
+                  : "accent-alpha-weak";
+            const cardBorder =
+              index % 3 === 0
+                ? "neutral-alpha-medium"
+                : index % 3 === 1
+                  ? "brand-alpha-medium"
+                  : "accent-alpha-medium";
+            const iconName = TEMPLATE_ICONS[template.id] ?? "sparkles";
 
-                <Text variant="body-default-s" onBackground="neutral-weak">
-                  {template.summary}
-                </Text>
-              </Column>
-            </Card>
-          ))}
+            return (
+              <RevealFx key={template.id} delay={index * 0.08} speed="fast">
+                <TiltFx intensity={4}>
+                  <Card
+                    border={cardBorder}
+                    background={cardBg}
+                    radius="l"
+                    padding="16"
+                    gap="16"
+                    fillHeight
+                    onClick={() => onSelectTemplate(template.id)}
+                    transition="micro-medium"
+                    shadow="s"
+                  >
+                    <Column gap="12" fillWidth flex="1" style={{ minHeight: 0 }}>
+                      <Row gap="12" vertical="center">
+                        <Column background="surface" border={cardBorder} radius="m" padding="12">
+                          <Icon name={iconName} size="m" onBackground="neutral-strong" />
+                        </Column>
+                        <Column gap="4">
+                          <Text variant="label-strong-m">{template.title}</Text>
+                          <Text variant="label-default-s" onBackground="neutral-weak">
+                            {template.subtitle}
+                          </Text>
+                        </Column>
+                      </Row>
+
+                      <Text variant="body-default-s" onBackground="neutral-weak">
+                        {template.summary}
+                      </Text>
+                    </Column>
+                  </Card>
+                </TiltFx>
+              </RevealFx>
+            );
+          })}
         </Grid>
       </Column>
     </Column>

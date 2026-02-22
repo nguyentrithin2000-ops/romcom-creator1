@@ -1,4 +1,4 @@
-import { Row, Text } from "@once-ui-system/core";
+import { Icon, Row, Text } from "@once-ui-system/core";
 
 interface HeartbeatCounterProps {
   value: number;
@@ -16,6 +16,7 @@ export function HeartbeatCounter({ value }: HeartbeatCounterProps) {
       gap="8"
       vertical="center"
     >
+      <Icon name="heart" size="s" onBackground="danger-strong" />
       <Text variant="label-strong-m">Hảo cảm:</Text>
       <Text variant="label-strong-m">{value}</Text>
     </Row>
