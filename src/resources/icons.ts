@@ -19,6 +19,7 @@ import {
   HiOutlineUser,
   HiOutlineMoon,
 } from "react-icons/hi2";
+import { SiGithub } from "react-icons/si";
 
 export const iconLibrary: Record<string, IconType> = {
   heart: HiOutlineHeart,
@@ -38,6 +39,7 @@ export const iconLibrary: Record<string, IconType> = {
   faceFrown: HiOutlineFaceFrown,
   faceSmile: HiOutlineFaceSmile,
   moon: HiOutlineMoon,
+  github: SiGithub,
 };
 
 export type IconLibrary = typeof iconLibrary;

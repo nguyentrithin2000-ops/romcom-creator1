@@ -71,7 +71,7 @@ const meta = {
     title: "RomCom Creator - Tạo visual novel romcom tương tác",
     description:
       "Tạo thế giới romcom, thiết kế nữ chính và điều hướng câu chuyện bằng lựa chọn tương tác trong RomCom Creator.",
-    image: "/images/og/home.jpg",
+    image: "/images/og/home.png",
     canonical: "https://romcom-creator.vercel.app/",
     robots: "index,follow",
     alternates: [{ href: "https://romcom-creator.vercel.app/", hrefLang: "vi" }],

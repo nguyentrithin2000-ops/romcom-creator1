@@ -1,79 +1,36 @@
-# Once UI for Next.js
+# Dự án: Chuyện tình thanh xuân bi hài của tôi quả nhiên là AI làm
 
-A design system for indie builders, startups and freelancers. Once UI combines the simplicity of low-code with the power of code: write 70% less code compared to shadcn + Tailwind. Includes 100+ advanced components.
+Chắc hẳn ai ở đây cũng từng ức chế khi xem anime hay đọc light novel mà main cứ đần đụt, hoặc waifu của mình lại bị thằng main từ chối. Lúc đó chỉ ước: **"Phải chi mình được chọn lại đoạn này!"**
 
-Check the demo [here](https://demo.once-ui.com).
+Đó là lý do mình build **Chuyện tình thanh xuân bi hài của tôi quả nhiên là AI làm** — một engine truyện tương tác (_Interactive Fiction_) chạy bằng AI, thiết kế riêng cho những tâm hồn yêu thích sự ngọt ngào (và cả drama) của Light Novel.
 
-![Once UI](public/images/og/home.jpg)
+## 🎮 Cách thức hoạt động
 
-## Features
+- **Xây dựng "Love Interest"**: Bạn mô tả mẫu hình lý tưởng hoặc bối cảnh trường học mơ ước. AI sẽ tự động "thổi hồn" vào dàn nhân vật: từ cô bạn thuở nhỏ đanh đá đến hội trưởng hội học sinh lạnh lùng.
+- **Tương tác không giới hạn**: Thay vì chọn A, B, C có sẵn, bạn có thể nhập bất cứ hành động nào. Muốn tỏ tình ngay chương 1 hay âm thầm bảo vệ từ xa? Thậm chí là vụt luôn? AI sẽ viết tiếp chương mới dựa trên lựa chọn đó.
+- **Mỗi playthrough là một kết thúc riêng**: Không có kịch bản định sẵn, flag nổ hay không là do cách bạn đối xử với dàn nhân vật.
 
-A lightweight starter template with the [Once UI Core](https://github.com/once-ui-system/core) package and our recommended setup to move fast and break limits without neglecting quality.
+## 🛠 Tech stack cho ai tò mò
 
-* **Customization**: Manage design config in a single file.
-* **Components**: Access advanced components with simple APIs.
-* **Data-viz**: Add responsive charts with a few lines of code.
-* **SEO**: Use our SEO components to simplify meta and schema setup.
-* **PRO**: Launch ready-made apps with minimal coding with Once UI Pro.
+- **Core**: Python FastAPI microservices đảm nhận việc xử lý cốt truyện và logic tình cảm.
+- **LangGraph Pipeline**: Mỗi lượt hành động sẽ qua 5 "biên tập viên" AI _(Planner điều hướng → Simulator giả lập tâm lý → Context kiểm tra lịch sử → Writer chấp bút → Critic chỉnh sửa văn phong)_.
+- **Đồ thị quan hệ (Relationship Graph)**: Dùng Neo4j để lưu trữ mức độ tình cảm, thiện cảm và các mối quan hệ chồng chéo giữa dàn waifu.
+- **Trí nhớ dài hạn**: Kết hợp mem0 + Qdrant để AI không bao giờ quên lời hứa của bạn từ 100 chương trước.
+- **Frontend**: Next.js (Web) và React Native (Mobile) cho trải nghiệm mượt mà như đọc sách thật.
 
-[Get Once UI Pro](https://once-ui.com/pricing)
+## 🧠 Thách thức lớn nhất
 
-## Documentation
+Viết Romcom mà AI "não cá vàng" là hỏng hết cảm xúc. Để AI ghi nhớ nhất quán từng chi tiết nhỏ (như sở thích ăn uống hay một kỷ niệm cũ), mình đã thiết lập hệ thống memory 4 tầng:
 
-Learn how to build with Once UI at [docs.once-ui.com](https://docs.once-ui.com/once-ui/quick-start).
+- PostgreSQL (sự kiện)
+- Neo4j (biến số tình cảm)
+- Qdrant (truy xuất ngữ nghĩa)
+- Redis (tốc độ phản hồi)
 
-## Quick start
+Dự án này mình "vừa tu vừa hú", tự build một mình từ A-Z. Hiện tại tuy chưa hoàn hảo 100% nhưng đã đủ để các bạn trải nghiệm một "route" tình yêu đầu tiên rồi.
 
-[Magic Portfolio](https://once-ui.com/products/magic-portfolio) (FREE): Portfolio starter used and loved by thousands of creatives. Simple, customizable, responsive.
+## 🔗 Mã nguồn dự án
 
-[Magic Docs](https://once-ui.com/products/magic-docs) (FREE): Documentation generator. Just add your MDX files and let Magic Docs handle the rest.
+[https://github.com/zennomi/romcom-creator](https://github.com/zennomi/romcom-creator)
 
-[Magic Bio](https://once-ui.com/products/magic-bio) (FREE): Link-in-bio template that automatically fetches open-graph data. Just add your links and deploy.
-
-[Magic Convert](https://once-ui.com/products/magic-convert) (PRO): Conversion-optimized landing page and dashboard template.
-
-[Magic Agent](https://once-ui.com/products/magic-agent) (PRO): Deployment-ready AI agent built with the Vercel AI SDK.
-
-[Magic Store](https://once-ui.com/products/magic-store) (PRO): Ecommerce storefront that lets you sell digital and physical products.
-
-[Once UI Blocks](https://once-ui.com/blocks) (PRO): Copy-paste pre-designed blocks and deploy fully-functional sites with lightning speed.
-
-## Design
-
-The design counterpart of the Once UI system is available [here](https://once-ui.com/figma).
-
-## Get started
-
-Clone the starter template from GitHub:
-```bash
-git clone https://github.com/once-ui-system/nextjs-starter.git
-```
-
-## Creators
-
-Connect with us!
-
-**Lorant One**: [Site](https://lorant.one) / [Threads](https://www.threads.net/@lorant.one) / [LinkedIn](https://www.linkedin.com/in/lorant-one/)
-
-**Zsofia Komaromi**: [Site](https://zsofia.pro) / [Threads](https://www.threads.net/@zsofia_kom) / [LinkedIn](https://www.linkedin.com/in/zsofiakomaromi/)
-
-## Become a Oncer
-
-![Design Engineers Club](https://docs.once-ui.com/images/docs/vibe-coding-dark.jpg)
-
-Join the [Design Engineers Club](https://discord.com/invite/5EyAQ4eNdS) on Discord to connect with us and share your projects.
-
-Found a bug? Report it [here](https://github.com/once-ui-system/nextjs-starter/issues/new?labels=bug&template=bug_report.md). Got a feature request? Submit it [here](https://github.com/once-ui-system/nextjs-starter/issues/new?labels=feature%20request&template=feature_request.md).
-
-Please use the Once UI Core [GitHub repository](https://github.com/once-ui-system/core) for design system contributions.
-
-## Sponsors
-
-Once UI is an indie project. [Sponsor us](https://github.com/sponsors/once-ui-system) and get featured on our site!
-
-## License
-
-Distributed under the MIT License. See `LICENSE.txt` for more information.
-
-## Deploy to Vercel
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fonce-ui-system%2Fnextjs-starter&project-name=nextjs-starter&repository-name=nextjs-starter&redirect-url=https%3A%2F%2Fgithub.com%2Fonce-ui-system%2Fnextjs-starter&demo-title=Next.js%20Starter&demo-description=Showcase%20your%20designers%20or%20developer%20portfolio&demo-url=https%3A%2F%2Fdemo.nextjs-starter.com&demo-image=%2F%2Fraw.githubusercontent.com%2Fonce-ui-system%2Fnextjs-starter%2Fmain%2Fpublic%2Fimages%2Fog%2Fhome.jpg)
+Mình đang phát triển theo hướng **TAO prompt AI Build**, nên mọi góp ý về văn phong hay tính năng từ các đồng đạo yêu Light Novel đều cực kỳ quý giá. Cảm ơn mọi người!

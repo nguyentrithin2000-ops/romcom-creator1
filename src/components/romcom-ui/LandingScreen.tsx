@@ -38,17 +38,32 @@ export function LandingScreen({
 }: LandingScreenProps) {
   return (
     <Column fillWidth gap="32">
-      <Row fillWidth horizontal="between" vertical="center" gap="12" wrap>
-        <Badge
-          icon="sparkles"
-          border="brand-alpha-medium"
-          background="brand-alpha-weak"
-          onBackground="brand-strong"
-          paddingX="12"
-          paddingY="8"
+      <Row
+        fillWidth
+        horizontal="between"
+        vertical="center"
+        gap="12"
+        wrap
+        position="relative"
+        style={{ zIndex: 999 }}
+      >
+        <a
+          href="https://github.com/zennomi/romcom-creator"
+          target="_blank"
+          rel="noopener noreferrer"
+          style={{ textDecoration: "none" }}
         >
-          <Text variant="label-default-s">Gemini 3.0 Pro</Text>
-        </Badge>
+          <Badge
+            icon="github"
+            border="brand-alpha-medium"
+            background="brand-alpha-weak"
+            onBackground="brand-strong"
+            paddingX="12"
+            paddingY="8"
+          >
+            <Text variant="label-default-s">GitHub</Text>
+          </Badge>
+        </a>
 
         <Badge
           icon="thunder"
@@ -72,7 +87,7 @@ export function LandingScreen({
             />
           </Row>
           <Text variant="body-default-m" onBackground="neutral-weak">
-            Chọn mẫu hoặc bắt đầu nhanh để trải nghiệm luồng visual novel tương tác.
+            Chọn một cốt truyện mẫu hoặc bắt đầu nhanh để trải nghiệm visual novel siêu tương tác.
           </Text>
         </Column>
       </GlitchFx>
@@ -97,7 +112,7 @@ export function LandingScreen({
           <Column gap="4">
             <Text variant="heading-strong-s">Bắt đầu nhanh</Text>
             <Text variant="body-default-s" onBackground="neutral-weak">
-              Vào ngay màn tạo truyện với dữ liệu mẫu để thử nhịp chơi.
+              Vào ngay màn tạo truyện với dữ liệu mẫu để chơi thử.
             </Text>
           </Column>
         </Row>
@@ -132,8 +147,8 @@ export function LandingScreen({
             const iconName = TEMPLATE_ICONS[template.id] ?? "sparkles";
 
             return (
-              <RevealFx key={template.id} delay={index * 0.08} speed="fast">
-                <TiltFx intensity={4}>
+              <RevealFx key={template.id} delay={index * 0.08} speed="fast" fillWidth>
+                <TiltFx intensity={4} fillWidth>
                   <Card
                     border={cardBorder}
                     background={cardBg}
@@ -144,9 +159,10 @@ export function LandingScreen({
                     onClick={() => onSelectTemplate(template.id)}
                     transition="micro-medium"
                     shadow="s"
+                    fillWidth
                   >
-                    <Column gap="12" fillWidth flex="1" style={{ minHeight: 0 }}>
-                      <Row gap="12" vertical="center">
+                    <Column gap="12" fillWidth flex="1">
+                      <Row gap="12" vertical="center" fillWidth>
                         <Column background="surface" border={cardBorder} radius="m" padding="12">
                           <Icon name={iconName} size="m" onBackground="neutral-strong" />
                         </Column>

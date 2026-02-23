@@ -9,3 +9,4 @@ export * from "./MemoryCard";
 export * from "./LandingScreen";
 export * from "./CreationScreen";
 export * from "./StoryScreen";
+export * from "./TrollScreen";

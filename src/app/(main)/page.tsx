@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { Column, Heading, Text } from "@once-ui-system/core";
+import { Column } from "@once-ui-system/core";
 import {
   CreationScreen,
   creationSteps,
@@ -16,6 +16,7 @@ import {
   StoryScreen,
   storyBeats,
   templateOptions,
+  TrollScreen,
 } from "@/components/romcom-ui";
 
 const clampAffection = (value: number) => Math.max(0, Math.min(100, value));
@@ -42,7 +43,6 @@ export default function Home() {
   const [customAction, setCustomAction] = useState("");
   const [isProcessing, setIsProcessing] = useState(false);
   const [isAffectionPanelOpen, setIsAffectionPanelOpen] = useState(false);
-  const [isStoryTrolled, setIsStoryTrolled] = useState(false);
 
   const beat = useMemo(() => getCurrentBeat(storyIndex), [storyIndex]);
 
@@ -50,14 +50,11 @@ export default function Home() {
 
   useEffect(() => {
     if (screen !== "story" || !TROLL_SCREEN_ENABLED) {
-      setIsStoryTrolled(false);
       return;
     }
 
-    setIsStoryTrolled(false);
-
     const timer = window.setTimeout(() => {
-      setIsStoryTrolled(true);
+      setScreen("troll");
     }, 5000);
 
     return () => {
@@ -73,7 +70,6 @@ export default function Home() {
     setCustomAction("");
     setIsProcessing(false);
     setIsAffectionPanelOpen(false);
-    setIsStoryTrolled(false);
   };
 
   const goToCreation = () => {
@@ -213,13 +209,21 @@ export default function Home() {
             haoCam={haoCam}
             customAction={customAction}
             isProcessing={isProcessing}
-            isStoryTrolled={isStoryTrolled}
             chapterAnimationKey={chapterAnimationKey}
             isAffectionPanelOpen={isAffectionPanelOpen}
             onToggleAffectionPanel={() => setIsAffectionPanelOpen((prev) => !prev)}
             onSelectChoice={handlePresetChoice}
             onCustomActionChange={setCustomAction}
             onSubmitCustomAction={handleSubmitCustomAction}
+          />
+        )}
+
+        {screen === "troll" && (
+          <TrollScreen
+            onExit={() => {
+              resetStoryState();
+              setScreen("landing");
+            }}
           />
         )}
       </Column>

@@ -1,4 +1,4 @@
-export type Screen = "landing" | "creation" | "story";
+export type Screen = "landing" | "creation" | "story" | "troll";
 
 export interface TemplateOption {
   id: string;
