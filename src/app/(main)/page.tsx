@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation"; // Thêm để xử lý Back
 import { Column } from "@once-ui-system/core";
 import {
   CreationScreen,
@@ -21,8 +22,7 @@ import {
 
 const clampAffection = (value: number) => Math.max(0, Math.min(100, value));
 
-const TROLL_SCREEN_ENABLED =
-  process.env.NEXT_PUBLIC_TROLL_SCREEN_ENABLED === "true";
+const TROLL_SCREEN_ENABLED = process.env.NEXT_PUBLIC_TROLL_SCREEN_ENABLED === "true";
 
 const getCurrentBeat = (index: number): StoryBeat => {
   const safeIndex = Math.max(0, Math.min(index, storyBeats.length - 1));
@@ -30,36 +30,66 @@ const getCurrentBeat = (index: number): StoryBeat => {
 };
 
 export default function Home() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
+  // --- QUẢN LÝ STATE ---
   const [screen, setScreen] = useState<Screen>("landing");
   const [creationStep, setCreationStep] = useState(0);
   const [creationForm, setCreationForm] = useState(initialCreationForm);
-
   const [heartbeat, setHeartbeat] = useState(initialHeartbeat);
   const [haoCam, setHaoCam] = useState(initialHaoCam);
-
   const [characters, setCharacters] = useState(initialCharacters);
-
   const [storyIndex, setStoryIndex] = useState(0);
   const [customAction, setCustomAction] = useState("");
   const [isProcessing, setIsProcessing] = useState(false);
   const [isAffectionPanelOpen, setIsAffectionPanelOpen] = useState(false);
 
-  const beat = useMemo(() => getCurrentBeat(storyIndex), [storyIndex]);
+  // --- 1. LOGIC AUTO-SAVE (LOCALSTORAGE) ---
+  // Load dữ liệu khi vào trang
+  useEffect(() => {
+    const savedData = localStorage.getItem("romcom_progress");
+    if (savedData) {
+      const parsed = JSON.parse(savedData);
+      setScreen(parsed.screen || "landing");
+      setCreationStep(parsed.creationStep || 0);
+      setCreationForm(parsed.creationForm || initialCreationForm);
+      setHeartbeat(parsed.heartbeat ?? initialHeartbeat);
+      setHaoCam(parsed.haoCam ?? initialHaoCam);
+      setCharacters(parsed.characters || initialCharacters);
+      setStoryIndex(parsed.storyIndex || 0);
+    }
+  }, []);
 
+  // Lưu dữ liệu mỗi khi có thay đổi
+  useEffect(() => {
+    const dataToSave = {
+      screen, creationStep, creationForm, heartbeat, haoCam, characters, storyIndex
+    };
+    localStorage.setItem("romcom_progress", JSON.stringify(dataToSave));
+  }, [screen, creationStep, creationForm, heartbeat, haoCam, characters, storyIndex]);
+
+  // --- 2. LOGIC ĐIỀU HƯỚNG (BACK BUTTON) ---
+  const updateScreen = (newScreen: Screen) => {
+    setScreen(newScreen);
+    router.push(`?screen=${newScreen}`, { scroll: false });
+  };
+
+  useEffect(() => {
+    const screenParam = searchParams.get("screen") as Screen;
+    if (screenParam && screenParam !== screen) {
+      setScreen(screenParam);
+    }
+  }, [searchParams]);
+
+  // --- CÁC LOGIC GAME ---
+  const beat = useMemo(() => getCurrentBeat(storyIndex), [storyIndex]);
   const chapterAnimationKey = `${beat.id}-${storyIndex}`;
 
   useEffect(() => {
-    if (screen !== "story" || !TROLL_SCREEN_ENABLED) {
-      return;
-    }
-
-    const timer = window.setTimeout(() => {
-      setScreen("troll");
-    }, 5000);
-
-    return () => {
-      window.clearTimeout(timer);
-    };
+    if (screen !== "story" || !TROLL_SCREEN_ENABLED) return;
+    const timer = window.setTimeout(() => updateScreen("troll"), 5000);
+    return () => window.clearTimeout(timer);
   }, [screen]);
 
   const resetStoryState = () => {
@@ -70,39 +100,28 @@ export default function Home() {
     setCustomAction("");
     setIsProcessing(false);
     setIsAffectionPanelOpen(false);
+    localStorage.removeItem("romcom_progress"); // Xóa khi chơi mới
   };
 
   const goToCreation = () => {
     setCreationStep(0);
-    setScreen("creation");
+    updateScreen("creation");
   };
 
   const applyChoice = (choice: StoryChoice) => {
-    if (isProcessing || heartbeat <= 0) {
-      return;
-    }
-
+    if (isProcessing || heartbeat <= 0) return;
     setHeartbeat((prev) => Math.max(0, prev - choice.heartbeatCost));
     setIsProcessing(true);
 
     window.setTimeout(() => {
       setCharacters((prev) =>
-        prev.map((character) => {
-          const delta = choice.affectionDelta[character.id] ?? 0;
-          return {
-            ...character,
-            affection: clampAffection(character.affection + delta),
-          };
-        }),
+        prev.map((char) => ({
+          ...char,
+          affection: clampAffection(char.affection + (choice.affectionDelta[char.id] ?? 0)),
+        }))
       );
-
       setHaoCam((prev) => Math.max(0, prev + choice.haoCamDelta));
-
-      setStoryIndex((prev) => {
-        const next = prev + 1;
-        return next >= storyBeats.length ? 0 : next;
-      });
-
+      setStoryIndex((prev) => (prev + 1 >= storyBeats.length ? 0 : prev + 1));
       setCustomAction("");
       setIsProcessing(false);
     }, 1050);
@@ -110,45 +129,28 @@ export default function Home() {
 
   const handlePresetChoice = (choiceId: string) => {
     const choice = beat.choices.find((item) => item.id === choiceId);
-    if (!choice) {
-      return;
-    }
-
-    applyChoice(choice);
+    if (choice) applyChoice(choice);
   };
 
   const handleSubmitCustomAction = () => {
-    if (customAction.trim().length === 0 || isProcessing || heartbeat <= 0) {
-      return;
-    }
-
-    const customChoice: StoryChoice = {
+    if (customAction.trim().length === 0 || isProcessing || heartbeat <= 0) return;
+    applyChoice({
       id: `custom-${beat.id}`,
       label: customAction,
       heartbeatCost: 1,
       haoCamDelta: 4,
-      affectionDelta: {
-        "an-nhien": 2,
-        "minh-thu": 2,
-        "khanh-linh": 2,
-      },
-    };
-
-    applyChoice(customChoice);
+      affectionDelta: { "an-nhien": 2, "minh-thu": 2, "khanh-linh": 2 },
+    });
   };
 
   const handleSelectTemplate = (templateId: string) => {
-    const picked = templateOptions.find((template) => template.id === templateId);
-    if (!picked) {
+    const picked = templateOptions.find((t) => t.id === templateId);
+    if (picked) {
+      setCreationForm((prev) => ({ ...prev, worldDescription: picked.quickPrompt }));
       goToCreation();
-      return;
+    } else {
+      goToCreation();
     }
-
-    setCreationForm((prev) => ({
-      ...prev,
-      worldDescription: picked.quickPrompt,
-    }));
-    goToCreation();
   };
 
   return (
@@ -157,10 +159,7 @@ export default function Home() {
       center
       style={{
         minHeight: "100dvh",
-        paddingLeft: "clamp(1rem, 4vw, 2.5rem)",
-        paddingRight: "clamp(1rem, 4vw, 2.5rem)",
-        paddingTop: "clamp(1.25rem, 4vw, 2rem)",
-        paddingBottom: "clamp(1.25rem, 4vw, 2rem)",
+        padding: "clamp(1.25rem, 4vw, 2rem) clamp(1rem, 4vw, 2.5rem)",
       }}
     >
       <Column
@@ -170,11 +169,7 @@ export default function Home() {
         background="surface"
         radius="xl"
         shadow="l"
-        style={{
-          padding: "clamp(1.25rem, 4vw, 2rem)",
-          gap: "clamp(1.25rem, 4vw, 2rem)",
-          borderRadius: "clamp(1rem, 3.2vw, 1.5rem)",
-        }}
+        style={{ padding: "clamp(1.25rem, 4vw, 2rem)", gap: "clamp(1.25rem, 4vw, 2rem)" }}
       >
         {screen === "landing" && (
           <LandingScreen
@@ -190,26 +185,18 @@ export default function Home() {
             steps={creationSteps}
             currentStep={creationStep}
             form={creationForm}
-            onChangeForm={(field, value) =>
-              setCreationForm((prev) => ({
-                ...prev,
-                [field]: value,
-              }))
-            }
+            onChangeForm={(field, value) => setCreationForm((p) => ({ ...p, [field]: value }))}
             onBack={() => {
               if (creationStep > 0) {
-                setCreationStep((prev) => prev - 1);
-                return;
+                setCreationStep((p) => p - 1);
+              } else {
+                updateScreen("landing");
               }
-
-              setScreen("landing");
             }}
-            onNextStep={() =>
-              setCreationStep((prev) => Math.min(prev + 1, creationSteps.length - 1))
-            }
+            onNextStep={() => setCreationStep((p) => Math.min(p + 1, creationSteps.length - 1))}
             onSubmit={() => {
               resetStoryState();
-              setScreen("story");
+              updateScreen("story");
             }}
           />
         )}
@@ -224,7 +211,7 @@ export default function Home() {
             isProcessing={isProcessing}
             chapterAnimationKey={chapterAnimationKey}
             isAffectionPanelOpen={isAffectionPanelOpen}
-            onToggleAffectionPanel={() => setIsAffectionPanelOpen((prev) => !prev)}
+            onToggleAffectionPanel={() => setIsAffectionPanelOpen((p) => !p)}
             onSelectChoice={handlePresetChoice}
             onCustomActionChange={setCustomAction}
             onSubmitCustomAction={handleSubmitCustomAction}
@@ -235,39 +222,14 @@ export default function Home() {
           <TrollScreen
             onExit={() => {
               resetStoryState();
-              setScreen("landing");
+              updateScreen("landing");
             }}
           />
         )}
       </Column>
-      {/* Corner glow - brand accent top-right */}
-      <Column
-        position="absolute"
-        style={{
-          top: 0,
-          right: 0,
-          width: "clamp(28%, 35vw, 40%)",
-          height: "clamp(32%, 42vw, 50%)",
-          background:
-            "radial-gradient(ellipse at top right, var(--once-brand-alpha-weak, rgba(99 102 241 / 0.15)) 0%, transparent 70%)",
-          pointerEvents: "none",
-          opacity: "clamp(0.5, 2vw, 0.9)",
-        }}
-      />
-      {/* Corner glow - accent bottom-left */}
-      <Column
-        position="absolute"
-        style={{
-          bottom: 0,
-          left: 0,
-          width: "clamp(24%, 31vw, 35%)",
-          height: "clamp(30%, 39vw, 45%)",
-          background:
-            "radial-gradient(ellipse at bottom left, var(--once-accent-alpha-weak, rgba(236 72 153 / 0.12)) 0%, transparent 70%)",
-          pointerEvents: "none",
-          opacity: "clamp(0.45, 2vw, 0.85)",
-        }}
-      />
+      {/* Các lớp Gradient giữ nguyên */}
+      <div style={{ position: 'absolute', top: 0, right: 0, width: '40%', height: '50%', background: 'radial-gradient(ellipse at top right, var(--once-brand-alpha-weak), transparent)', pointerEvents: 'none' }} />
+      <div style={{ position: 'absolute', bottom: 0, left: 0, width: '35%', height: '45%', background: 'radial-gradient(ellipse at bottom left, var(--once-accent-alpha-weak), transparent)', pointerEvents: 'none' }} />
     </Column>
   );
 }
